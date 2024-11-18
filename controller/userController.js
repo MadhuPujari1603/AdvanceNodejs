@@ -1,6 +1,7 @@
 import User from "../schemas/user.js";
 import Adhar from "../schemas/adhar.js";
 import asynchandler from "express-async-handler";
+import bcrypt from "bcryptjs";
 
 export const adduser = asynchandler(async (req, res) => {
     try {
@@ -114,32 +115,32 @@ export const deleteUser = asynchandler(async (req, res) => {
 
 });
 
-export const updateUser= asynchandler(async(req,res)=>{
-    try{
-
-        const user = await User.findByIdAndUpdate(req.params.id,req.body,{new : true});
-        if(!user){
+export const updateUser = asynchandler(async (req, res) => {
+    try {
+        
+        const updatedUser = await User.findByIdAndUpdate(req.params.id, req.body, { new: true});
+        
+        if (!updatedUser) {
             return res.status(404).json({
-                success:false ,
-                mesg :"No user Found with this id"
+                success: false,
+                message: "No user found with this ID"
             });
         }
+        updatedUser.save();
         return res.status(200).json({
-            success:true,
-            user,
-            mesg:"user updated successfully"
-            
+            success: true,
+            data: updatedUser,
+            message: "User updated successfully"
+        });
+    } catch (error) {
+        console.error("Error updating user:", error);
+        return res.status(500).json({
+            success: false,
+            message: "Error updating user"
         });
     }
-    catch(error){
-        console.log(error);
-        return res.status(500).json({
-            success:false,
-            mesg: " error in updating user "
-
-        });   
-    }
 });
+
 
 export const findByPhone = asynchandler(async (req, res) => {
     try {
@@ -212,6 +213,36 @@ export  const findByUserNameContaining = asynchandler(async (req, res) => {
     }
 });
 
+
+export const login = asynchandler(async (req, res) => {
+    try {
+        const { email, password } = req.body;
+        const user = await User.findOne({ email });
+        if (!user) {
+            return res.status(404).json({
+                success: false,
+                msg: "user not found",
+            });
+        }
+        const isMatch = await bcrypt.compare(password, user.password);
+        if (!isMatch) {
+            return res.status(401).json({
+                success: false,
+                msg: "Invalid credentials",
+            });
+        }
+        return res.status(200).json({
+            success: true,
+            user,
+        });
+    } catch (error) {        
+        console.log(error);
+        return res.status(500).json({
+            success: false,
+            msg: "error logging in",
+        });
+    }
+});
 
 
 

@@ -3,6 +3,7 @@ import asyncHandler from "express-async-handler";
 import User from "../schemas/user.js";
 
 
+
 export const addAadhar = asyncHandler(async (req, res) => {
     try {
         const { aadharNumber, user } = req.body;
@@ -50,7 +51,7 @@ export const addAadhar = asyncHandler(async (req, res) => {
 
 export const getAadhar = asyncHandler(async (req, res) => {
     try {
-        const adhar = await Adhar.findById(req.params.id);
+        const adhar = await Adhar.find();
         if (!adhar) {
             return res.status(404).json({
                 success: false,
@@ -73,7 +74,7 @@ export const getAadhar = asyncHandler(async (req, res) => {
 export const updateAdhar = asyncHandler(async (req, res) => {
     try {
         const { aadharNumber } = req.body;
-        const adhar = await Adhar.findByIdAndUpdate(req.params.id, { aadharNumber }, { new: true });
+        const adhar = await Adhar.findByIdAndUpdate(req.params.id, req.body, { new: true });
         if (!adhar) {
             return res.status(404).json({
                 success: false,
@@ -95,7 +96,7 @@ export const updateAdhar = asyncHandler(async (req, res) => {
 
 export const findByUserId = asyncHandler(async (req, res) => {
     try {
-        const adhar = await Adhar.findOne({ user: req.params.id });
+        const adhar = await Adhar.findOne({ user : req.params.id });
         if (!adhar) {
             return res.status(404).json({
                 success: false,
@@ -116,4 +117,5 @@ export const findByUserId = asyncHandler(async (req, res) => {
 });
 
 
+       
        
